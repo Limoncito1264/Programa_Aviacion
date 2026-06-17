@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071a2d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Towing Log">
+<title>Towing Log PRO</title>
+
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+button, select, input { touch-action: manipulation; }
+button { cursor: pointer; }
+
+body {
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+  background: #071a2d;
+  color: #eaf2fb;
+  padding: 14px;
+  margin: 0;
+  padding-bottom: 60px;
+}
+
+h1 {
+  text-align: center;
+  color: #4fc3f7;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 6px 0 16px;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  background: #102a43;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #1d3b5a;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8ec9f0;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 10px 2px;
+}
+
+label.field-label {
+  display: block;
+  font-size: 12px;
+  color: #9fb6cc;
+  margin: 0 0 4px 2px;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin: 0 0 10px 0;
+  border-radius: 8px;
+  border: 1px solid #234a6e;
+  background: #0b2138;
+  color: #eaf2fb;
+  font-size: 16px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #4fc3f7;
+}
+
+input::placeholder { color: #5a7691; }
+
+select {
+  appearance: none;
+  font-weight: 600;
+  background-image: linear-gradient(145deg, #173a59, #0b2138);
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.row2 input { margin-bottom: 0; }
+
+.time-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.time-row input { margin-bottom: 0; flex: 1; }
+
+.btn-now {
+  flex-shrink: 0;
+  width: 52px;
+  border-radius: 8px;
+  border: 1px solid #234a6e;
+  background: #173a59;
+  color: #4fc3f7;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.divider {
+  border-top: 1px solid #1d3b5a;
+  margin: 4px 0 12px;
+}
+
+button.action {
+  width: 100%;
+  padding: 15px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-send { background: #00c853; color: #06210f; }
+.btn-save { background: #173a59; color: #eaf2fb; border: 1px solid #2a5d89; }
+.btn-reset { background: transparent; color: #9fb6cc; border: 1px solid #234a6e; }
+.btn-history { background: transparent; color: #eaf2fb; border: 1px solid #234a6e; display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; }
+
+button.action:active { transform: scale(0.98); }
+
+.error-box {
+  color: #ff8a80;
+  font-size: 13px;
+  text-align: center;
+  margin: 4px 0 10px;
+}
+
+.flash {
+  color: #69f0ae;
+  font-size: 13px;
+  text-align: center;
+  margin: 4px 0 10px;
+}
+
+#history { margin-top: 10px; }
+
+.hist-item {
+  border: 1px solid #1d3b5a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  background: #0b2138;
+}
+
+.hist-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.hist-matricula { font-weight: 700; color: #4fc3f7; }
+.hist-date { color: #6b88a3; font-size: 11px; }
+.hist-tec { color: #9fb6cc; }
+
+.hist-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hist-actions button {
+  flex: 1;
+  padding: 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid #234a6e;
+  background: #173a59;
+  color: #eaf2fb;
+  cursor: pointer;
+}
+
+.empty-hint {
+  color: #6b88a3;
+  font-size: 13px;
+  text-align: center;
+  padding: 14px 0;
+}
+
+footer {
+  text-align: center;
+  font-size: 11px;
+  color: #4a6280;
+  margin-top: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>✈ TOWING LOG PRO</h1>
+
+<div class="card">
+  <p class="section-title">Datos de la aeronave</p>
+  <label class="field-label">Matricula</label>
+  <select id="matricula">
+    <option value="">Selecciona matricula</option>
+    <option>N505VL *203</option>
+    <option>N506VL *204</option>
+    <option>N508VL *206</option>
+    <option>N509VL *207</option>
+    <option>N510VL *208</option>
+  </select>
+
+  <label class="field-label">Tecnico</label>
+  <select id="tecnico">
+    <option value="">Selecciona tecnico</option>
+    <option>BLANCA PATRICIA</option>
+    <option>MICOL NORIEGA</option>
+    <option>OSWALDO LOPEZ</option>
+    <option>PABLO MORENO</option>
+    <option>RODOLFO ZAMACONA</option>
+    <option>YARELI RONQUILLO</option>
+    <option>ARMANDO SANCHEZ</option>
+  </select>
+</div>
+
+<div class="card">
+  <p class="section-title">Remolque</p>
+
+  <label class="field-label">Llegada a la aeronave</label>
+  <div class="time-row">
+    <input id="llegada" placeholder="HH:MM">
+    <button class="btn-now" type="button" data-now-target="llegada">⏱</button>
+  </div>
+
+  <label class="field-label">Inicio de remolque</label>
+  <div class="time-row">
+    <input id="inicio" placeholder="HH:MM">
+    <button class="btn-now" type="button" data-now-target="inicio">⏱</button>
+  </div>
+
+  <label class="field-label">Fin de remolque</label>
+  <div class="time-row">
+    <input id="fin" placeholder="HH:MM">
+    <button class="btn-now" type="button" data-now-target="fin">⏱</button>
+  </div>
+</div>
+
+<div class="card">
+  <p class="section-title">Baterias</p>
+
+  <label class="field-label">Antes de ON (V)</label>
+  <div class="row2">
+    <input id="battBeforeOnV1" placeholder="V1">
+    <input id="battBeforeOnV2" placeholder="V2">
+  </div>
+
+  <label class="field-label">ON time</label>
+  <div class="time-row">
+    <input id="battOnTime" placeholder="HH:MM">
+    <button class="btn-now" type="button" data-now-target="battOnTime">⏱</button>
+  </div>
+
+  <label class="field-label">ON voltaje</label>
+  <div class="row2">
+    <input id="battOnV1" placeholder="V1">
+    <input id="battOnV2" placeholder="V2">
+  </div>
+
+  <div class="divider"></div>
+
+  <label class="field-label">Antes de OFF (V)</label>
+  <div class="row2">
+    <input id="battBeforeOffV1" placeholder="V1">
+    <input id="battBeforeOffV2" placeholder="V2">
+  </div>
+
+  <label class="field-label">OFF time</label>
+  <div class="time-row">
+    <input id="battOffTime" placeholder="HH:MM">
+    <button class="btn-now" type="button" data-now-target="battOffTime">⏱</button>
+  </div>
+
+  <label class="field-label">OFF voltaje</label>
+  <div class="row2">
+    <input id="battOffV1" placeholder="V1">
+    <input id="battOffV2" placeholder="V2">
+  </div>
+</div>
+
+<div class="card">
+  <p class="section-title">Posiciones</p>
+  <div class="row2">
+    <div>
+      <label class="field-label">Posicion de salida</label>
+      <input id="posSalida" placeholder="Ej. 1">
+    </div>
+    <div>
+      <label class="field-label">Posicion de llegada</label>
+      <input id="posLlegada" placeholder="Ej. MTX 7">
+    </div>
+  </div>
+</div>
+
+<div id="msgBox"></div>
+
+<button class="action btn-send" type="button" id="btnSend">📤 Enviar por WhatsApp</button>
+<button class="action btn-save" type="button" id="btnSave">💾 Guardar en bitacora</button>
+<button class="action btn-reset" type="button" id="btnReset">↺ Nuevo registro</button>
+<button class="action btn-history" type="button" id="btnToggleHistory">
+  <span id="historyToggleLabel">📁 Bitacora local (0)</span>
+  <span id="historyChevron">▾</span>
+</button>
+
+<div id="history" style="display:none"></div>
+
+<footer>Los registros se guardan en este dispositivo</footer>
+
+<script>
+const FIELD_IDS = [
+  "matricula","tecnico","llegada","inicio","fin",
+  "battBeforeOnV1","battBeforeOnV2","battOnTime","battOnV1","battOnV2",
+  "battBeforeOffV1","battBeforeOffV2","battOffTime","battOffV1","battOffV2",
+  "posSalida","posLlegada"
+];
+
+const WHATSAPP_NUMBER = "526644034781";
+const STORAGE_KEY = "towingLogsPro";
+
+function pad2(n) { return n.toString().padStart(2, "0"); }
+
+function nowHHMM() {
+  const d = new Date();
+  return pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+}
+
+function setNow(id) {
+  document.getElementById(id).value = nowHHMM();
+}
+
+function getForm() {
+  const f = {};
+  FIELD_IDS.forEach(id => { f[id] = document.getElementById(id).value.trim(); });
+  return f;
+}
+
+function buildMessage(f) {
+  return "MATRICULA:   " + f.matricula + "\n" +
+"TECNICO:    " + f.tecnico + "\n" +
+"LLEGADA A AL AERONAVE: " + f.llegada + "\n" +
+"INICIO DE REMOLQUE:   " + f.inicio + "\n" +
+"FIN DE REMOLQUE:   " + f.fin + "\n" +
+"BATERIAS ANTES DE ON : " + f.battBeforeOnV1 + "  /  " + f.battBeforeOnV2 + "\n" +
+"BATERIAS ON:   TIME :  " + f.battOnTime + "          V:  " + f.battOnV1 + "  /  " + f.battOnV2 + " \n" +
+"BATERIAS ANTES DE OFF:  " + f.battBeforeOffV1 + "  /  " + f.battBeforeOffV2 + "\n" +
+"BATERIAS OFF:   TIME:   " + f.battOffTime + "        V: " + f.battOffV1 + "  /  " + f.battOffV2 + "\n" +
+"POSICION DE SALIDA :  " + f.posSalida + "\n" +
+"POSICION DE LLEGADA :  " + f.posLlegada;
+}
+
+function showMsg(text, kind) {
+  const box = document.getElementById("msgBox");
+  box.innerHTML = "<p class='" + (kind === "ok" ? "flash" : "error-box") + "'>" + text + "</p>";
+  if (kind === "ok") setTimeout(() => { box.innerHTML = ""; }, 2500);
+}
+
+function validate(f) {
+  if (!f.matricula) return "Falta seleccionar la matricula";
+  if (!f.tecnico) return "Falta seleccionar el tecnico";
+  return null;
+}
+
+function openWhatsApp(text) {
+  const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
+  window.location.href = url;
+}
+
+function sendWhatsApp() {
+  const f = getForm();
+  const err = validate(f);
+  if (err) { showMsg(err, "error"); return; }
+  openWhatsApp(buildMessage(f));
+}
+
+function loadLogs() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLog() {
+  const f = getForm();
+  const err = validate(f);
+  if (err) { showMsg(err, "error"); return; }
+
+  const logs = loadLogs();
+  logs.push({
+    savedAt: new Date().toISOString(),
+    displayDate: new Date().toLocaleString(),
+    form: f,
+    text: buildMessage(f)
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  showMsg("Registro guardado", "ok");
+  renderHistory();
+}
+
+function resetForm() {
+  FIELD_IDS.forEach(id => { document.getElementById(id).value = ""; });
+  document.getElementById("msgBox").innerHTML = "";
+}
+
+function toggleHistory() {
+  const el = document.getElementById("history");
+  const chevron = document.getElementById("historyChevron");
+  const isOpen = el.style.display !== "none";
+  el.style.display = isOpen ? "none" : "block";
+  chevron.textContent = isOpen ? "▾" : "▴";
+}
+
+function deleteLog(index) {
+  const logs = loadLogs();
+  logs.splice(index, 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  renderHistory();
+}
+
+function resendLog(index) {
+  const logs = loadLogs();
+  const item = logs[index];
+  if (!item) return;
+  openWhatsApp(item.text);
+}
+
+function renderHistory() {
+  const logs = loadLogs();
+  document.getElementById("historyToggleLabel").textContent = "📁 Bitacora local (" + logs.length + ")";
+
+  const container = document.getElementById("history");
+  if (logs.length === 0) {
+    container.innerHTML = "<p class='empty-hint'>Aun no hay registros guardados en este dispositivo</p>";
+    return;
+  }
+
+  let html = "";
+  logs.slice().reverse().forEach((l, revIndex) => {
+    const realIndex = logs.length - 1 - revIndex;
+    const f = l.form || {};
+    html += "<div class='hist-item'>" +
+      "<div class='hist-top'>" +
+        "<span class='hist-matricula'>" + (f.matricula || "(sin matricula)") + "</span>" +
+        "<span class='hist-date'>" + l.displayDate + "</span>" +
+      "</div>" +
+      "<div class='hist-tec'>" + (f.tecnico || "?") + " &middot; Salida " + (f.posSalida || "-") + " &rarr; Llegada " + (f.posLlegada || "-") + "</div>" +
+      "<div class='hist-actions'>" +
+        "<button type='button' data-resend='" + realIndex + "'>Reenviar WhatsApp</button>" +
+        "<button type='button' data-delete='" + realIndex + "'>Eliminar</button>" +
+      "</div>" +
+    "</div>";
+  });
+  container.innerHTML = html;
+}
+
+document.getElementById("btnSend").addEventListener("click", sendWhatsApp);
+document.getElementById("btnSave").addEventListener("click", saveLog);
+document.getElementById("btnReset").addEventListener("click", resetForm);
+document.getElementById("btnToggleHistory").addEventListener("click", toggleHistory);
+
+document.querySelectorAll("[data-now-target]").forEach(btn => {
+  btn.addEventListener("click", () => setNow(btn.getAttribute("data-now-target")));
+});
+
+document.getElementById("history").addEventListener("click", function(ev) {
+  const resendBtn = ev.target.closest("[data-resend]");
+  if (resendBtn) { resendLog(parseInt(resendBtn.getAttribute("data-resend"), 10)); return; }
+  const deleteBtn = ev.target.closest("[data-delete]");
+  if (deleteBtn) { deleteLog(parseInt(deleteBtn.getAttribute("data-delete"), 10)); return; }
+});
+
+renderHistory();
+</script>
+
+</body>
+</html>
